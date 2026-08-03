@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedido de cubiertas — Andreani</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDEFEC;
+    --bg-panel:#ffffff;
+    --ink:#1B1D1E;
+    --ink-soft:#5B5F5C;
+    --ink-faint:#8B8F8B;
+    --line:#D8D8D2;
+    --line-strong:#B8B9B2;
+    --asphalt:#232A31;
+    --asphalt-soft:#3A434C;
+    --safety:#E15A0F;
+    --safety-dark:#B4470B;
+    --safety-bg:#FCE7DA;
+    --ok:#2E6B3E;
+    --ok-bg:#E3F0E4;
+    --radius:10px;
+    --font-display:'Barlow Condensed',sans-serif;
+    --font-body:'Inter',system-ui,sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed; top:0; left:0; right:0; height:6px;
+    background:repeating-linear-gradient(90deg,var(--asphalt) 0 22px,var(--safety) 22px 40px);
+    z-index:50;
+  }
+  .wrap{max-width:840px;margin:0 auto;padding:34px 20px 80px;}
+  header.top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:8px;}
+  h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:34px;
+    letter-spacing:0.2px;
+    margin:0;
+    color:var(--asphalt);
+  }
+  .subtitle{color:var(--ink-soft);font-size:14.5px;margin:2px 0 26px;}
+  .plate{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--ink-faint);
+    border:1px solid var(--line-strong);
+    border-radius:5px;
+    padding:3px 9px;
+    letter-spacing:0.5px;
+  }
+  .card{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 22px;
+    margin-bottom:18px;
+  }
+  .card h2{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:20px;
+    margin:0 0 14px;
+    color:var(--asphalt);
+    display:flex;align-items:center;gap:10px;
+  }
+  .step-num{
+    font-family:var(--font-mono);
+    font-size:12px;
+    background:var(--asphalt);
+    color:#fff;
+    width:22px;height:22px;
+    border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  label{display:block;font-size:13px;color:var(--ink-soft);margin-bottom:5px;font-weight:500;}
+  input[type=text],input[type=number],select{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line-strong);
+    border-radius:7px;
+    font-size:15px;
+    font-family:var(--font-body);
+    background:#fff;
+    color:var(--ink);
+  }
+  input:focus,select:focus{outline:2px solid var(--safety);outline-offset:1px;border-color:var(--safety);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr;}}
+  .field{margin-bottom:14px;}
+  .medida-tag{
+    font-family:var(--font-mono);
+    font-weight:600;
+    font-size:13px;
+    background:var(--asphalt);
+    color:#fff;
+    padding:2px 8px;
+    border-radius:4px;
+    display:inline-block;
+  }
+  .opciones{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+  .opcion{
+    display:flex;align-items:center;gap:12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:11px 13px;
+    cursor:pointer;
+    transition:border-color .12s, background .12s;
+  }
+  .opcion:hover{border-color:var(--line-strong);background:#FAFAF8;}
+  .opcion.selected{border-color:var(--safety);background:var(--safety-bg);}
+  .opcion input[type=radio]{accent-color:var(--safety);width:17px;height:17px;flex-shrink:0;}
+  .opcion .info{flex:1;min-width:0;}
+  .opcion .modelo{font-weight:500;font-size:14.5px;color:var(--ink);}
+  .opcion .meta{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+  .badge{
+    font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;
+    padding:2px 7px;border-radius:4px;margin-right:6px;
+  }
+  .badge.premium{background:#E3EAF2;color:#2A4A6E;}
+  .badge.alternativa{background:#EFE9DE;color:#6E5A2A;}
+  .badge.mejor{background:var(--ok-bg);color:var(--ok);}
+  .precio{font-family:var(--font-mono);font-weight:600;font-size:16px;color:var(--asphalt);white-space:nowrap;}
+  .add-row{display:flex;align-items:center;gap:10px;margin-top:16px;}
+  .qty{width:64px;text-align:center;}
+  button{
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:14.5px;
+    border-radius:8px;
+    border:1px solid var(--line-strong);
+    background:#fff;
+    color:var(--ink);
+    padding:10px 16px;
+    cursor:pointer;
+    transition:transform .08s, background .12s;
+  }
+  button:hover{background:#F5F4F1;}
+  button:active{transform:scale(.98);}
+  button.primary{
+    background:var(--safety);
+    border-color:var(--safety-dark);
+    color:#fff;
+  }
+  button.primary:hover{background:var(--safety-dark);}
+  button.primary:disabled{background:#D8D5CE;border-color:#D8D5CE;color:#999;cursor:not-allowed;}
+  button.ghost{background:transparent;border-color:transparent;color:var(--ink-soft);padding:6px 8px;}
+  button.ghost:hover{color:var(--safety-dark);background:transparent;}
+  .cart-item{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .cart-item:last-child{border-bottom:none;}
+  .cart-item .ci-info{flex:1;min-width:0;}
+  .cart-item .ci-medida{font-family:var(--font-mono);font-weight:600;font-size:13.5px;}
+  .cart-item .ci-modelo{font-size:13px;color:var(--ink-soft);}
+  .cart-item .ci-precio{font-family:var(--font-mono);font-size:14px;white-space:nowrap;}
+  .empty{color:var(--ink-faint);font-size:14px;text-align:center;padding:18px 0;}
+  .total-row{display:flex;justify-content:space-between;align-items:baseline;padding-top:14px;margin-top:6px;border-top:2px solid var(--asphalt);}
+  .total-row .label{font-family:var(--font-display);font-size:18px;color:var(--asphalt);}
+  .total-row .amount{font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--safety-dark);}
+  .submit-bar{display:flex;justify-content:flex-end;margin-top:18px;}
+  .confirm{
+    text-align:center;padding:50px 20px;
+  }
+  .confirm .tick{
+    width:56px;height:56px;border-radius:50%;background:var(--ok-bg);color:var(--ok);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;
+  }
+  .confirm h2{font-family:var(--font-display);font-size:26px;margin:0 0 6px;}
+  .confirm .code{font-family:var(--font-mono);color:var(--ink-soft);font-size:14px;}
+  .footer-link{
+    text-align:center;margin-top:34px;
+  }
+  .footer-link a{color:var(--ink-faint);font-size:12px;text-decoration:none;cursor:pointer;}
+  .footer-link a:hover{color:var(--safety-dark);text-decoration:underline;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th{font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--asphalt);background:#F5F4F1;position:sticky;top:0;}
+  td.num{font-family:var(--font-mono);}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;}
+  .admin-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .stat{
+    background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 18px;
+  }
+  .stat .n{font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--asphalt);}
+  .stat .l{font-size:12px;color:var(--ink-soft);}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+  @media(max-width:560px){.stats{grid-template-columns:1fr;}}
+  .hidden{display:none !important;}
+  .row-actions{display:flex;gap:6px;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const CATALOGO = [{"medida": "165/65 R14", "opciones": [{"proveedor": "VERONA", "modelo": "KUMHO", "precio": 289256.2, "categoria": "Alternativa"}]}, {"medida": "165/70 R13", "opciones": [{"proveedor": "CALZETTA", "modelo": "79T QIRIN 990 SENTURY", "precio": 53805.78, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "FIREMAX", "precio": 57024.79, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO", "precio": 62479.33, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "165/70R13 ASSURANCE MAXLIFE", "precio": 77617.6, "categoria": "Premium"}]}, {"medida": "165/70 R14", "opciones": [{"proveedor": "NEUMEN", "modelo": "PIRELLI 165/70 R14 85T XL P1CINT 165/70 R14", "precio": 103303.24, "categoria": "Premium"}]}, {"medida": "170/70 R14", "opciones": [{"proveedor": "LAROCCA", "modelo": "FIREST F-600", "precio": 79531.0, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "PIRELLI.", "precio": 90909.09, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "PIRELLI", "precio": 90909.09, "categoria": "Alternativa"}]}, {"medida": "175/65 R14", "opciones": [{"proveedor": "CALZETTA", "modelo": "82H VI-786 OVATION", "precio": 60528.92, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO C6", "precio": 60743.8, "categoria": "Alternativa"}, {"proveedor": "NEUMEN", "modelo": "JK TYRE 175/65 R14 82T VECTRA", "precio": 62241.07, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "175/65R14 ASSURANCE MAXLIFE", "precio": 71094.23, "categoria": "Premium"}, {"proveedor": "LAROCCA", "modelo": "FIREST F-600", "precio": 77214.0, "categoria": "Premium"}, {"proveedor": "NEUMEN", "modelo": "PIRELLI 175/65 R14 82T P1 CINT(KS)", "precio": 79905.2, "categoria": "Premium"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL CHAMPIRO VP1 175/65R14 82T", "precio": 83641.0, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "PIRELLI P400", "precio": 90909.09, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "PIRELLI P400", "precio": 90909.09, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "82T POWERCONTACT2 CONTINENTAL", "precio": 103125.62, "categoria": "Premium"}]}, {"medida": "175/65 R15", "opciones": [{"proveedor": "VERONA", "modelo": "TRIANGLE 175/65 R15", "precio": 115702.48, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "165/70 R14C WEST LAKE", "precio": 116892.56, "categoria": "Alternativa"}]}, {"medida": "175/70 R13", "opciones": [{"proveedor": "CALZETTA", "modelo": "82T QIRIN 990 SENTURY", "precio": 56882.64, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO C6", "precio": 59504.13, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "PIRELLI FORMULA", "precio": 70247.93, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL CHAMPIRO VP1 175/70R13 82T", "precio": 73917.0, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "175/70R13 ASSURANCE MAXLIFE", "precio": 78007.56, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "82T POWERCONTACT CONTINENTAL", "precio": 90788.43, "categoria": "Premium"}]}, {"medida": "175/70 R14", "opciones": [{"proveedor": "CALZETTA", "modelo": "88T QIRIN 990 SENTURY", "precio": 63322.31, "categoria": "Alternativa"}, {"proveedor": "NEUMEN", "modelo": "JK TYRE 175/70 R14 84T VECTRA", "precio": 65561.13, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO C7", "precio": 74380.16, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIREST F-600", "precio": 79531.0, "categoria": "Premium"}, {"proveedor": "NEUMEN", "modelo": "PIRELLI 175/70 R14 84T P1 CINT(KS)", "precio": 80378.53, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "175/70R14  EFFICIENTGRIP PERFORMANCE", "precio": 86099.69, "categoria": "Premium"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL CHAMPIRO VP1 175/70R14 88T", "precio": 87601.94, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "PIRELLI P400", "precio": 90909.09, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "PIRELLI P400", "precio": 90909.09, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "84T POWERCONTACT 2 CONTINENTAL", "precio": 107429.75, "categoria": "Premium"}]}, {"medida": "175/75 R14", "opciones": [{"proveedor": "VERONA", "modelo": "PIRELLI.", "precio": 90909.09, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "PIRELLI", "precio": 90909.09, "categoria": "Alternativa"}]}, {"medida": "185/14/102/7", "opciones": [{"proveedor": "CALZETTA", "modelo": "(CARGA) 8PR 102/100R C V-03 OVATION", "precio": 92082.64, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO", "precio": 102892.56, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "FIREMAX", "precio": 115702.48, "categoria": "Alternativa"}]}, {"medida": "185/55 R16", "opciones": [{"proveedor": "CALZETTA", "modelo": "83V QIRIN 990 SENTURY", "precio": 76833.06, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "SAILUM", "precio": 123966.94, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "83V FR POWERCONTACT 2 CONTINENTAL", "precio": 142907.44, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "185/55R16 EAGLE SPORT 2", "precio": 154780.47, "categoria": "Premium"}, {"proveedor": "MEDICI", "modelo": "FATE EXIMIA PININFARINA", "precio": 169884.0, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "BRIDG NEU PSR 185/55R16 TZA ER300 83\\V\\-\\TL", "precio": 189546.0, "categoria": "Premium"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GOODYEAR EAGLE SPORT 2 185/55R16 83V", "precio": 190816.0, "categoria": "Alternativa"}]}, {"medida": "185/60 R15", "opciones": [{"proveedor": "MEDICI", "modelo": "TERCELO C6", "precio": 71900.82, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "84H QIRIN 990 SENTURY", "precio": 76369.42, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "FIREMAX", "precio": 76859.5, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIREST F-600", "precio": 89820.0, "categoria": "Premium"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL CHAMPIRO VP1 185/60R15 84H", "precio": 93604.0, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "185/65R15 EAGLE TOURING", "precio": 103018.5, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "84H POWERCONTACT 2 CONTINENTAL", "precio": 131171.07, "categoria": "Premium"}]}, {"medida": "185/65 R14", "opciones": [{"proveedor": "MEDICI", "modelo": "TERCELO C6", "precio": 66942.14, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "86H QIRIN 990 SENTURY", "precio": 67795.87, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL CHAMPIRO VP1 185/65R14 86H", "precio": 89578.0, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "PIRELLI P1", "precio": 90909.09, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIREST F-600", "precio": 92483.0, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "185/65R15 EAGLE TOURING", "precio": 103018.5, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "86T POWERCONTACT 2 CONTINENTAL", "precio": 115527.27, "categoria": "Premium"}]}, {"medida": "185/65 R15", "opciones": [{"proveedor": "MEDICI", "modelo": "TERCELO C6", "precio": 66942.14, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "88V QIRIN 990 SENTURY", "precio": 74608.26, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIREST F-700", "precio": 99104.0, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "FIREMAX", "precio": 99173.55, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "185/65R15 EAGLE TOURING", "precio": 103018.5, "categoria": "Premium"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL CHAMPIRO VP1 185/65R15 88H", "precio": 103920.0, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "88H POWERCONTACT 2 CONTINENTAL", "precio": 129489.26, "categoria": "Premium"}]}, {"medida": "185/70 R14", "opciones": [{"proveedor": "CALZETTA", "modelo": "88H QIRIN 990 SENTURY", "precio": 72793.39, "categoria": "Alternativa"}, {"proveedor": "NEUMEN", "modelo": "JK TYRE 185/70 R14 88T STAR TRAK", "precio": 73030.31, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO C6", "precio": 73140.49, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "TRIANGLE", "precio": 74380.17, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "PIRELLI P1", "precio": 90909.09, "categoria": "Premium"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL CHAMPIRO VP1 185/70R14 88H", "precio": 91098.0, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "185/70R14 EFFICIENTGRIP PERFORMANCE", "precio": 96231.19, "categoria": "Premium"}, {"proveedor": "LAROCCA", "modelo": "FIREST F-600", "precio": 96634.0, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(CARGA) 88H POWERCONTACT2 CONTINENTAL", "precio": 129613.22, "categoria": "Premium"}]}, {"medida": "186/65 R15", "opciones": [{"proveedor": "GOODYEAR", "modelo": "185/65R15 EAGLE SPORT 2", "precio": 98922.19, "categoria": "Premium"}, {"proveedor": "LAROCCA", "modelo": "FIREST F-700", "precio": 99104.0, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "FIREMAX", "precio": 99173.55, "categoria": "Alternativa"}]}, {"medida": "195/55 R15", "opciones": [{"proveedor": "CALZETTA", "modelo": "85V QIRIN 990 SENTURY", "precio": 73752.07, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO C6", "precio": 78099.17, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "195/55R15 EAGLE SPORT 2", "precio": 97490.53, "categoria": "Premium"}, {"proveedor": "LAROCCA", "modelo": "FIREST F-600", "precio": 98575.0, "categoria": "Premium"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL CHAMPIRO VP1 195/55R15 85H", "precio": 98989.0, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "TRIANGLE", "precio": 115702.48, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "85H POWERCONTACT 2 FR CONTINENTAL", "precio": 116650.41, "categoria": "Premium"}]}, {"medida": "195/55 R16", "opciones": [{"proveedor": "CALZETTA", "modelo": "91V QIRIN 990 SENTURY", "precio": 86021.49, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO SPORTD1", "precio": 89256.19, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "FIREMAX", "precio": 107438.02, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "CHAMPIRO VP1 195/55R16 91H", "precio": 113778.0, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIREST F-700", "precio": 139574.0, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "195/55R16 EFFICIENTGRIP PERFORMANCE XL", "precio": 163041.07, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "87V POWERCONTACT FR CONTINENTAL", "precio": 163827.27, "categoria": "Premium"}]}, {"medida": "195/60 R15", "opciones": [{"proveedor": "CALZETTA", "modelo": "88V QIRIN 990 SENTURY", "precio": 76338.84, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "TRINAGLE", "precio": 99173.55, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIREST F-600", "precio": 108321.0, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "195/60R15 EFFICIENTGRIP PERFORMANCE", "precio": 118380.53, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "88H POWERCONTACT2 CONTINENTAL", "precio": 130132.23, "categoria": "Premium"}]}, {"medida": "195/70 R15", "opciones": [{"proveedor": "CALZETTA", "modelo": "(CARGA) 104/102S C QIRIN V88+ SENTURY", "precio": 103268.59, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO WZT705", "precio": 110330.57, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL MAXMILER PR 195/70R15C 102R (CARGA)", "precio": 155036.0, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "SAILUM 8T", "precio": 157024.79, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU PSR 195/70R15 CV5000 104\\R\\-\\TL", "precio": 177742.0, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(CARGA) 104/102R 8PR VANCONTACT ULTRA CONTINENTAL", "precio": 213464.46, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "195/70R15C CARGO MARATHON 2", "precio": 216296.71, "categoria": "Premium"}]}, {"medida": "195/75 R16", "opciones": [{"proveedor": "CALZETTA", "modelo": "(CARGA) 107/105R C QIRIN V88+ SENTURY", "precio": 117529.75, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO", "precio": 117768.59, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "TRIANGLE", "precio": 173553.72, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL MAXMILER PR 195/75R16C 105R (CARGA)", "precio": 176447.0, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU HT 195/75R16 CV5000 107\\R\\-\\TL", "precio": 177478.0, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "195/75R16C CARGO MARATHON 2", "precio": 185243.94, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(CARGA) 107/105R VANCO CONTACT AP CONTINENTAL", "precio": 234449.59, "categoria": "Premium"}]}, {"medida": "205/50 R17", "opciones": [{"proveedor": "CALZETTA", "modelo": "93W Z QIRIN 990 SENTURY", "precio": 97035.54, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO SPORTD1", "precio": 99173.55, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "FIREMAX", "precio": 123966.94, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GITICOMFORT F22 205/50R17 93V", "precio": 139998.0, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU PSR 205/50R17 F-700+ 93\\V\\-\\TL", "precio": 162299.0, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "205/50R17 EAGLE TOURING", "precio": 195338.04, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "89V PREMIUM CONTACT 2 E CONTINENTAL", "precio": 204328.92, "categoria": "Premium"}]}, {"medida": "205/55 R16", "opciones": [{"proveedor": "MEDICI", "modelo": "TERCELO C6", "precio": 81818.18, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "94W QIRIN 990 SENTURY", "precio": 86128.1, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "FIREMAX", "precio": 90909.09, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL CHAMPIRO VP1 205/55R16 91V", "precio": 108924.0, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIREST F-600", "precio": 114035.0, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "91V POWERCONTACT 2 CONTINENTAL", "precio": 133694.21, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "205/55R16 WRANGLER TERRITORY AT SL", "precio": 177723.53, "categoria": "Premium"}]}, {"medida": "205/70 R15", "opciones": [{"proveedor": "CALZETTA", "modelo": "(CARGA) 106/104S LT DRAGONLOADS SENTURY", "precio": 116003.3, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELOCARGA", "precio": 116528.92, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL CHAMPIRO VP1 205/70R15 95T", "precio": 117019.0, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "96T CROSSCONTACT AT CONTINENTAL", "precio": 168700.0, "categoria": "Premium"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU HT 205/70R15 CV5000 106\\R\\-\\TL", "precio": 182730.0, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "FIREMAX", "precio": 190082.64, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "205/70R15C CARGO MARATHON 2", "precio": 214791.07, "categoria": "Premium"}]}, {"medida": "205/75 R16", "opciones": [{"proveedor": "CALZETTA", "modelo": "(CARGA) 110/108R 8PR V-02 OVATION", "precio": 121782.64, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO", "precio": 147520.06, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "TRIANGLE", "precio": 181818.18, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU HT 205/75R16 CV5000 110\\R\\-\\TL", "precio": 188382.0, "categoria": "Premium"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL MAXMILER PR 205/75R16C 111R (CARGA)", "precio": 205938.0, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "205/75R16C CARGO MARATHON 2", "precio": 206575.24, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(CARGA) 110/108R VANCO CONTACT AP CONTINENTAL", "precio": 255224.79, "categoria": "Premium"}]}, {"medida": "215/65 R16", "opciones": [{"proveedor": "MEDICI", "modelo": "TERCELO C6", "precio": 101652.89, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "(CARGA) 109/107T C QIRIN V88+ SENTURY", "precio": 122025.62, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL CHAMPIRO VP1 215/65R16 98T", "precio": 134981.0, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "FIREMAX", "precio": 140495.87, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "215/65R16 WRANGLER WORKHORSE AT", "precio": 174489.69, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "102H CROSSCONTACT LX2 CONTINENTAL", "precio": 183458.68, "categoria": "Premium"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU HT 215/65R16 DEST LE3 102\\H\\-\\TL", "precio": 187739.0, "categoria": "Premium"}]}, {"medida": "215/75 R16", "opciones": [{"proveedor": "CALZETTA", "modelo": "(CARGA) 8PR 113/111R CARGO 4 DURABLE", "precio": 134421.49, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "SAILUM 8T", "precio": 198347.11, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL MAXMILER PR 215/75R16C 114R (CARGA)", "precio": 218294.0, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "BRIDG NEU HT 215/75R16 DVIS R630 113\\R\\-\\TL", "precio": 219665.0, "categoria": "Premium"}]}, {"medida": "215/75 R17.5", "opciones": [{"proveedor": "CALZETTA", "modelo": "(LISA) 16PR 135/133J ECOPLUS A2 XBRI", "precio": 138075.13, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "TRIANGLE", "precio": 198347.11, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO LISA", "precio": 208264.46, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "BRIDG NEU TRL 255/70R22.5 R294 140\\M\\-\\TL", "precio": 228369.0, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "215/75 R17.5 GOODYEAR REGIONAL RHS", "precio": 271852.02, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(LISA) 126/124M CH LA3 TL CONTINENTAL", "precio": 288727.22, "categoria": "Premium"}]}, {"medida": "225/65 R16", "opciones": [{"proveedor": "CALZETTA", "modelo": "(CARGA) 112/110T C QIRIN V88+ SENTURY", "precio": 135651.24, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL MAXMILER PR 225/65R16C 110T (CARGA)", "precio": 187143.0, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "SAILUM 8T", "precio": 198347.11, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU HT 225/65R16 CV5000 112\\R\\-\\TL", "precio": 210220.0, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "225/65R16C G32 CARGO", "precio": 258233.67, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(CARGA) 112/110R VANCO CONTACT AP CONTINENTAL", "precio": 288983.47, "categoria": "Premium"}]}, {"medida": "225/70 R15", "opciones": [{"proveedor": "CALZETTA", "modelo": "(CARGA) 112/111R 8PR C V-03 OVATION", "precio": 119133.06, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELOCARGA", "precio": 142561.98, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU HT 225/70R15 CV5000 112\\R\\-\\TL", "precio": 182730.0, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "FATE", "precio": 198347.11, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "FATE", "precio": 198347.11, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "225/70R15C CARGO MARATHON 2", "precio": 230188.87, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(CARGA) 112/110R 8PR C VANCONTACT ULTRA CONTINENTAL", "precio": 233991.73, "categoria": "Premium"}]}, {"medida": "225/75 R16", "opciones": [{"proveedor": "CALZETTA", "modelo": "(CARGA) 121/120R 12 PR V-02 OVATION", "precio": 144195.04, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO C", "precio": 182231.4, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "SAILUM 8T", "precio": 206611.57, "categoria": "Alternativa"}, {"proveedor": "GOODYEAR", "modelo": "225/75R16C CARGO MARATHON 2", "precio": 226325.97, "categoria": "Premium"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL ADVTURO AT3 LT225/75R16 112S (AT)", "precio": 248753.0, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU HT 225/75R16 CV5000 121\\R\\-\\TL", "precio": 278895.0, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(CARGA) 118/116R 10PR C VANCONTACT AP CONTINENTAL", "precio": 293105.78, "categoria": "Premium"}]}, {"medida": "235/65 R16", "opciones": [{"proveedor": "VERONA", "modelo": "PIRELLI FORMULA", "precio": 70247.93, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(CARGA) 115/113T  QIRIN V88+ SENTURY", "precio": 143161.16, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELOCARGA", "precio": 145041.32, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "SAILUM 8T", "precio": 264462.81, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "BRIDG NEU HT 235/65R16 DVIS R660 115\\T\\-\\TL", "precio": 271142.0, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "235/65R16C CARGO MARATHON 2", "precio": 285909.93, "categoria": "Premium"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GOODYEAR CARGO MARATHON 2 235/65R16C (CARGA)", "precio": 376783.0, "categoria": "Alternativa"}]}, {"medida": "235/75 R17.5", "opciones": [{"proveedor": "CALZETTA", "modelo": "(LISA) 18PR 143/141J ECOPLUS  XBRI", "precio": 165481.76, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "TRIANGLE", "precio": 239669.42, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "(LISA) 132/130M CH LA3 CONTINENTAL", "precio": 346912.16, "categoria": "Premium"}]}, {"medida": "255/70 R22.5", "opciones": [{"proveedor": "CALZETTA", "modelo": "(LISA) 16PR 135/133J ECOPLUS A2 XBRI", "precio": 138075.13, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "TRIANGLE", "precio": 289256.2, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "TRIANGLE", "precio": 289256.2, "categoria": "Alternativa"}]}, {"medida": "255/75 R16", "opciones": [{"proveedor": "VERONA", "modelo": "PIRELLI.", "precio": 371900.83, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "PIRELLI", "precio": 371900.83, "categoria": "Alternativa"}]}, {"medida": "265/60 R18", "opciones": [{"proveedor": "CALZETTA", "modelo": "110V QIRIN 990 SUV SENTURY", "precio": 170700.0, "categoria": "Alternativa"}, {"proveedor": "MEDICI", "modelo": "TERCELO", "precio": 179752.06, "categoria": "Alternativa"}, {"proveedor": "SAN JUAN Y SOLIS", "modelo": "GTRADIAL ADVTURO AT3 265/60R18 109T (AT)", "precio": 196916.0, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "110T FR CROSSCONTACT ATR CONTINENTAL", "precio": 239150.41, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "265/60R18 WRANGLER TERRITORY AT", "precio": 242929.6, "categoria": "Premium"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU AT 265/60R18 DEST ATX 114\\T\\-\\TL", "precio": 276169.0, "categoria": "Premium"}, {"proveedor": "VERONA", "modelo": "SAILUM 8T", "precio": 289256.2, "categoria": "Alternativa"}]}, {"medida": "275/80 R22.5", "opciones": [{"proveedor": "VERONA", "modelo": "KUMHO ZETUM", "precio": 297520.66, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "KUMHO ZETUM", "precio": 297520.66, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "(LISA) 18PR 149/146 M RSVI-162+ OVATION", "precio": 307464.46, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "(LISA) 18PR 149/146 M RSVI-162+ OVATION", "precio": 308105.09, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(TACO) 18PR 152/149 M XS VI-605 OVATION", "precio": 320165.72, "categoria": "Alternativa"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU DIR 275/80R22.5 FS440Z 149\\L\\16PR\\TL", "precio": 469694.0, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "275/80 R22.5 GOODYEAR KMAX S GEN-2", "precio": 500166.05, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(LISA) 149/146L CHS3 SA CONTINENTAL", "precio": 501330.96, "categoria": "Premium"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU TRC 275/80R22.5 FD663 148\\M\\16PR\\TL", "precio": 536004.0, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(TACO) 149/146L CHD3 SA CONTINENTAL", "precio": 537333.99, "categoria": "Premium"}]}, {"medida": "295/80 R22.5", "opciones": [{"proveedor": "VERONA", "modelo": "FIREMAX 18T", "precio": 297520.66, "categoria": "Alternativa"}, {"proveedor": "VERONA", "modelo": "FIREMAX 18T", "precio": 305785.12, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "(LISA) 18PR 152/149 M RSVI-162 OVATION", "precio": 320165.29, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "(TACO) 18PR 149/146 L RSVI-668 OVATION", "precio": 325306.45, "categoria": "Alternativa"}, {"proveedor": "CALZETTA", "modelo": "(LISA) 18PR 152/149 M RSVI-162 OVATION", "precio": 331384.2, "categoria": "Premium"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU DIR 295/80R22.5 FS440Z 152\\M\\16PR\\TL", "precio": 488206.0, "categoria": "Premium"}, {"proveedor": "GOODYEAR", "modelo": "295/80 R22.5 GOODYEAR KMAX RSA", "precio": 489292.63, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(LISA) 152/148M CHS3 SA CONTINENTAL", "precio": 523456.11, "categoria": "Premium"}, {"proveedor": "LAROCCA", "modelo": "FIRES NEU TRC 295/80R22.5 FD663 II 152\\M\\16PR\\TL", "precio": 580210.0, "categoria": "Premium"}, {"proveedor": "CALZETTA", "modelo": "(TACO) 152/148M CHD3 SA CONTINENTAL", "precio": 580636.39, "categoria": "Premium"}]}];
+
+let cart = [];
+let selectedMedida = null;
+let selectedOpcionIdx = null;
+
+function fmt(n){
+  return Number(n).toLocaleString('es-AR', {maximumFractionDigits:0});
+}
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = viewPedido();
+  bindPedidoEvents();
+}
+
+function viewPedido(){
+  const medidaOptions = CATALOGO.map(m => `<option value="${m.medida}">${m.medida}</option>`).join('');
+
+  let opcionesHtml = '';
+  if(selectedMedida){
+    const entry = CATALOGO.find(m => m.medida === selectedMedida);
+    const min = Math.min(...entry.opciones.map(o=>o.precio));
+    opcionesHtml = `<div class="opciones">` + entry.opciones.map((o,i) => `
+      <label class="opcion ${selectedOpcionIdx===i?'selected':''}" data-idx="${i}">
+        <input type="radio" name="opcion" value="${i}" ${selectedOpcionIdx===i?'checked':''}>
+        <div class="info">
+          <div class="modelo">${o.modelo}</div>
+          <div class="meta">
+            <span class="badge ${o.categoria==='Premium'?'premium':'alternativa'}">${o.categoria}</span>
+            ${o.precio===min?'<span class="badge mejor">Menor precio</span>':''}
+            ${o.proveedor}
+          </div>
+        </div>
+        <div class="precio">$${fmt(o.precio)}</div>
+      </label>
+    `).join('') + `</div>`;
+  }
+
+  const cartHtml = cart.length === 0
+    ? `<div class="empty">Todavía no agregaste ninguna cubierta.</div>`
+    : cart.map((c,i) => `
+      <div class="cart-item">
+        <div class="ci-info">
+          <div class="ci-medida">${c.medida} <span style="color:var(--ink-faint);font-weight:400;">× ${c.cantidad}</span></div>
+          <div class="ci-modelo">${c.proveedor} — ${c.modelo}</div>
+        </div>
+        <div class="ci-precio">$${fmt(c.precio * c.cantidad)}</div>
+        <button class="ghost" onclick="removeFromCart(${i})" aria-label="Quitar">✕</button>
+      </div>
+    `).join('');
+
+  const total = cart.reduce((s,c) => s + c.precio*c.cantidad, 0);
+
+  return `
+    <header class="top">
+      <h1>Pedido de cubiertas</h1>
+      <span class="plate">ANDREANI · TRANSPORTISTAS</span>
+    </header>
+    <p class="subtitle">Elegí la medida, comparás precios y mandás el pedido. Nosotros lo vemos del otro lado, sin planillas.</p>
+
+    <div class="card">
+      <h2><span class="step-num">1</span>Tus datos</h2>
+      <div class="grid2">
+        <div class="field">
+          <label for="nombre">Nombre y apellido</label>
+          <input type="text" id="nombre" placeholder="Ej: Juan Pérez" value="${(window.__nombre||'')}">
+        </div>
+        <div class="field">
+          <label for="acreedor">N° de acreedor</label>
+          <input type="text" id="acreedor" placeholder="Ej: 4521" value="${(window.__acreedor||'')}">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="step-num">2</span>Elegí una cubierta</h2>
+      <div class="field" style="margin-bottom:0;">
+        <label for="medida-select">Medida</label>
+        <select id="medida-select">
+          <option value="">Seleccioná una medida...</option>
+          ${medidaOptions}
+        </select>
+      </div>
+      ${opcionesHtml}
+      ${selectedMedida ? `
+      <div class="add-row">
+        <label style="margin:0;flex-shrink:0;">Cantidad</label>
+        <input type="number" id="cantidad" class="qty" min="1" value="1">
+        <button class="primary" id="btn-add" ${selectedOpcionIdx===null?'disabled':''}>Agregar al pedido</button>
+      </div>` : ''}
+    </div>
+
+    <div class="card">
+      <h2><span class="step-num">3</span>Tu pedido</h2>
+      ${cartHtml}
+      ${cart.length > 0 ? `
+      <div class="total-row">
+        <span class="label">Total</span>
+        <span class="amount">$${fmt(total)}</span>
+      </div>` : ''}
+      <div class="submit-bar">
+        <button class="primary" id="btn-submit" ${cart.length===0?'disabled':''}>Enviar pedido</button>
+      </div>
+    </div>
+
+    <div class="footer-link"><a onclick="tryAdmin()">Panel Andreani</a></div>
+  `;
+}
+
+function bindPedidoEvents(){
+  const nombreEl = document.getElementById('nombre');
+  const acreedorEl = document.getElementById('acreedor');
+  nombreEl.addEventListener('input', e => window.__nombre = e.target.value);
+  acreedorEl.addEventListener('input', e => window.__acreedor = e.target.value);
+
+  const medidaSelect = document.getElementById('medida-select');
+  medidaSelect.value = selectedMedida || '';
+  medidaSelect.addEventListener('change', e => {
+    selectedMedida = e.target.value || null;
+    selectedOpcionIdx = null;
+    render();
+  });
+
+  document.querySelectorAll('.opcion').forEach(el => {
+    el.addEventListener('click', () => {
+      selectedOpcionIdx = parseInt(el.dataset.idx);
+      render();
+    });
+  });
+
+  const btnAdd = document.getElementById('btn-add');
+  if(btnAdd){
+    btnAdd.addEventListener('click', () => {
+      const entry = CATALOGO.find(m => m.medida === selectedMedida);
+      const o = entry.opciones[selectedOpcionIdx];
+      const cantidad = Math.max(1, parseInt(document.getElementById('cantidad').value) || 1);
+      cart.push({medida: selectedMedida, proveedor:o.proveedor, modelo:o.modelo, precio:o.precio, categoria:o.categoria, cantidad});
+      selectedMedida = null;
+      selectedOpcionIdx = null;
+      render();
+    });
+  }
+
+  const btnSubmit = document.getElementById('btn-submit');
+  if(btnSubmit){
+    btnSubmit.addEventListener('click', submitPedido);
+  }
+}
+
+async function submitPedido(){
+  const nombre = (document.getElementById('nombre').value || '').trim();
+  const acreedor = (document.getElementById('acreedor').value || '').trim();
+  if(!nombre || !acreedor){
+    alert('Completá nombre y apellido y el número de acreedor antes de enviar.');
+    return;
+  }
+  if(cart.length === 0) return;
+
+  const id = 'PED-' + Date.now().toString(36).toUpperCase();
+  const pedido = {
+    id, fecha: new Date().toISOString(),
+    nombre, acreedor,
+    items: cart,
+    total: cart.reduce((s,c)=>s+c.precio*c.cantidad,0)
+  };
+
+  try{
+    await window.storage.set('pedido:' + id, JSON.stringify(pedido), true);
+  }catch(err){
+    alert('No se pudo enviar el pedido. Probá de nuevo en un momento.');
+    console.error(err);
+    return;
+  }
+
+  cart = [];
+  window.__nombre = '';
+  window.__acreedor = '';
+  showConfirm(id);
+}
+
+function showConfirm(id){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <header class="top">
+      <h1>Pedido de cubiertas</h1>
+      <span class="plate">ANDREANI · TRANSPORTISTAS</span>
+    </header>
+    <div class="card confirm">
+      <div class="tick">✓</div>
+      <h2>Pedido enviado</h2>
+      <p style="color:var(--ink-soft);">Ya lo recibimos, en breve te contactamos para coordinar.</p>
+      <p class="code">Código: ${id}</p>
+      <div style="margin-top:22px;">
+        <button class="primary" onclick="render()">Cargar otro pedido</button>
+      </div>
+    </div>
+    <div class="footer-link"><a onclick="tryAdmin()">Panel Andreani</a></div>
+  `;
+}
+
+function removeFromCart(i){
+  cart.splice(i,1);
+  render();
+}
+
+function tryAdmin(){
+  const code = prompt('Código de acceso interno:');
+  if(code === null) return;
+  if(code.trim().toLowerCase() === 'andreani2026'){
+    renderAdmin();
+  } else {
+    alert('Código incorrecto.');
+  }
+}
+
+async function renderAdmin(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <header class="top">
+      <h1>Panel de pedidos</h1>
+      <span class="plate">ANDREANI · INTERNO</span>
+    </header>
+    <p class="subtitle">Cargando pedidos...</p>
+  `;
+
+  let pedidos = [];
+  try{
+    const list = await window.storage.list('pedido:', true);
+    const keys = (list && list.keys) ? list.keys : [];
+    for(const k of keys){
+      try{
+        const res = await window.storage.get(k, true);
+        if(res && res.value) pedidos.push(JSON.parse(res.value));
+      }catch(e){}
+    }
+  }catch(err){
+    console.error(err);
+  }
+
+  pedidos.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+
+  const totalPedidos = pedidos.length;
+  const totalCubiertas = pedidos.reduce((s,p)=>s+p.items.reduce((s2,it)=>s2+it.cantidad,0),0);
+  const totalMonto = pedidos.reduce((s,p)=>s+p.total,0);
+
+  const rows = [];
+  pedidos.forEach(p => {
+    p.items.forEach(it => {
+      rows.push({...it, id:p.id, fecha:p.fecha, nombre:p.nombre, acreedor:p.acreedor});
+    });
+  });
+
+  const tableRows = rows.map(r => `
+    <tr>
+      <td>${new Date(r.fecha).toLocaleString('es-AR')}</td>
+      <td>${r.nombre}</td>
+      <td>${r.acreedor}</td>
+      <td>${r.medida}</td>
+      <td>${r.proveedor}</td>
+      <td>${r.modelo}</td>
+      <td>${r.categoria}</td>
+      <td class="num">$${fmt(r.precio)}</td>
+      <td class="num">${r.cantidad}</td>
+      <td class="num">$${fmt(r.precio*r.cantidad)}</td>
+      <td><span style="font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);">${r.id}</span></td>
+    </tr>
+  `).join('');
+
+  app.innerHTML = `
+    <header class="top">
+      <h1>Panel de pedidos</h1>
+      <span class="plate">ANDREANI · INTERNO</span>
+    </header>
+    <p class="subtitle">Los datos se comparten entre todos los que usan este panel.</p>
+
+    <div class="stats">
+      <div class="stat"><div class="n">${totalPedidos}</div><div class="l">Pedidos recibidos</div></div>
+      <div class="stat"><div class="n">${totalCubiertas}</div><div class="l">Cubiertas solicitadas</div></div>
+      <div class="stat"><div class="n">$${fmt(totalMonto)}</div><div class="l">Monto total</div></div>
+    </div>
+
+    <div class="card">
+      <div class="admin-toolbar">
+        <button onclick="renderAdmin()">↻ Actualizar</button>
+        <div style="display:flex;gap:8px;">
+          <button class="primary" id="btn-export">Descargar Excel</button>
+          <button onclick="render()">Volver al formulario</button>
+        </div>
+      </div>
+      ${rows.length === 0 ? `<div class="empty">Todavía no llegó ningún pedido.</div>` : `
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Fecha</th><th>Nombre y apellido</th><th>N° acreedor</th><th>Medida</th>
+            <th>Proveedor</th><th>Modelo</th><th>Categoría</th><th>Precio un.</th><th>Cant.</th><th>Subtotal</th><th>Pedido</th>
+          </tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>`}
+    </div>
+    <div class="footer-link"><a onclick="render()">Volver al formulario de pedido</a></div>
+  `;
+
+  const btnExport = document.getElementById('btn-export');
+  if(btnExport){
+    btnExport.addEventListener('click', () => exportExcel(rows));
+  }
+}
+
+function exportExcel(rows){
+  if(typeof XLSX === 'undefined'){
+    alert('No se pudo cargar el generador de Excel. Probá de nuevo.');
+    return;
+  }
+  const data = rows.map(r => ({
+    'Fecha': new Date(r.fecha).toLocaleString('es-AR'),
+    'Nombre y apellido': r.nombre,
+    'N° acreedor': r.acreedor,
+    'Medida': r.medida,
+    'Proveedor': r.proveedor,
+    'Modelo': r.modelo,
+    'Categoría': r.categoria,
+    'Precio unitario': r.precio,
+    'Cantidad': r.cantidad,
+    'Subtotal': r.precio * r.cantidad,
+    'N° de pedido': r.id
+  }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  ws['!cols'] = [{wch:18},{wch:22},{wch:12},{wch:12},{wch:14},{wch:32},{wch:12},{wch:14},{wch:8},{wch:12},{wch:16}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Pedidos');
+  const fecha = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `pedidos_cubiertas_${fecha}.xlsx`);
+}
+
+render();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+</html>
